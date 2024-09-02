@@ -1,0 +1,89 @@
+:root {
+    --color-background: #333;
+    --color-text: white;
+    --color-hover: #f39c12;
+    --color-active: #e74c3c;
+}
+
+/* Estilos generales */
+header {
+    background-color: var(--color-background);
+    padding: 15px 0;
+    color: var(--color-text);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo a {
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style-type: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--color-hover);
+}
+
+.nav-links a:active {
+    color: var(--color-active);
+}
+
+/* Estilos para el menú hamburguesa en dispositivos móviles */
+.menu-toggle {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: var(--color-background);
+        position: absolute;
+        top: 60px;
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+}
