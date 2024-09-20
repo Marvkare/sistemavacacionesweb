@@ -124,7 +124,7 @@ if ($result->num_rows > 0) {
                 <a href='view_request_employee.php?employee_id=" . $row["EmployeeID"] . "'>Ver solicitudes</a> |
                 <a href='delete_user.php?employee_id=" . $row["EmployeeID"] . "' onclick='return confirm(\"¿Estás seguro de que quieres eliminar este usuario?\");'>Eliminar</a>
 
-                <a href='updateVacationsUsr.php?employee_id=" . $row["EmployeeID"] . "' onclick='return confirm(\"¿Estás seguro de que quieres eliminar este usuario?\");'>Eliminar</a>
+                <a href='updateVacationsUsr.php?employee_id=" . $row["EmployeeID"] . "'>Actualizar vacaciones</a>
               </td>";
         echo "</tr>";
     }

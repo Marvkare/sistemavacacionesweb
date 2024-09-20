@@ -1,4 +1,6 @@
 <?php
+
+include "db.php";
 function actualizarDiasDeVacaciones($employeeId, $conn) {
     // Paso 1: Obtener la fecha actual
     $currentDate = new DateTime();
@@ -66,22 +68,38 @@ function actualizarDiasDeVacaciones($employeeId, $conn) {
 
             // Verificar si la actualización fue exitosa
             if ($stmtUpdate->affected_rows > 0) {
-                echo "Los días de vacaciones han sido actualizados correctamente para el empleado con ID: $employeeId.";
+                echo "<script>alert('Los días de vacaciones han sido actualizados correctamente para el empleado con ID: $employeeId.');</script>";
+
+                header('Location: view_all_users.php');
             } else {
-                echo "No se pudo actualizar los días de vacaciones.";
+
+                echo "<script>alert('No se pudo actualizar los días de vacaciones.');</script>";
+
+                header('Location: view_all_users.php');
             }
 
             // Cerrar la declaración
             $stmtUpdate->close();
         } else {
-            echo "No ha pasado un año desde la última actualización de vacaciones.";
+
+            echo "<script>alert('No ha pasado un año desde la última actualización de vacaciones.');</script>";
+
+            header('Location: view_all_users.php');
         }
     } else {
-        echo "No se encontró al empleado con ID: $employeeId.";
+        echo "<script>alert('No se encontró al empleado con ID: $employeeId.');</script>";
+
+        header('Location: view_all_users.php');
     }
 
     // Cerrar la declaración inicial
     $stmt->close();
 }
 
+if (isset($_GET['employee_id'])) {
+    $employeeId = $_GET['employee_id'];
+
+    actualizarDiasDeVacaciones($employeeId,$conn);
+
+}
 ?>
