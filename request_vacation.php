@@ -127,6 +127,7 @@ if ($employeeId > 0) {
         <p><strong>Nombre:</strong> <?= htmlspecialchars($employeeData['FirstName']) . ' ' . htmlspecialchars($employeeData['LastName']) ?></p>
         <p><strong>Fecha de Contratación:</strong> <?= htmlspecialchars($employeeData['HireDate']) ?></p>
         <p><strong>Días de Vacaciones Disponibles:</strong> <?= htmlspecialchars($employeeData['CurrentEntitlement']) ?></p>
+       
     <?php endif; ?>
 
     <form method="post">
@@ -149,7 +150,7 @@ if ($employeeId > 0) {
             <input type="date" id="end_date" name="end_date">
           
             <label for="motivo">Motivo</label>
-            <input type="text" id="motivo" name="motivo">
+            <input type="text" id="motivo1" name="motivo1">
         </div>
 
         <!-- Campos para Permiso Parcial -->
@@ -164,7 +165,7 @@ if ($employeeId > 0) {
             <input type="datetime-local" id="return_datetime" name="return_datetime" >
             
             <label for="motivo">Motivo</label>
-            <input type="text" id="motivo" name="motivo" >
+            <input type="text" id="motivo2" name="motivo2" >
         </div>
 
         <input type="submit" value="Enviar Solicitud">
@@ -176,6 +177,7 @@ if ($employeeId > 0) {
             if (this.value === 'vacation') {
                 document.getElementById('vacation_fields').style.display = 'block';
                 document.getElementById('leave_fields').style.display = 'none';
+
             } else {
                 document.getElementById('vacation_fields').style.display = 'none';
                 document.getElementById('leave_fields').style.display = 'block';
@@ -184,8 +186,6 @@ if ($employeeId > 0) {
     </script>
 </body>
 </html>
-
-
 <?php
 // **Paso 3:** Validar y procesar la solicitud según el tipo de solicitud
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -196,9 +196,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validar campos de vacaciones completas
         $startDate = $_POST['start_date'];
         $endDate = $_POST['end_date'];
-        $motivo =$_POST['motivo'];
-        
-        if (empty($startDate) || empty($endDate)) {
+        $motivo = $_POST['motivo1'];
+
+        if (empty(trim($motivo))) {
+            echo "<script>alert('El motivo no puede estar vacío.');</script>";
+        } elseif (empty($startDate) || empty($endDate)) {
             echo "<script>alert('Por favor, complete las fechas de inicio y fin para la solicitud de vacaciones.');</script>";
         } else {
             // Procesar solicitud de vacaciones completas
@@ -211,56 +213,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('No tienes suficientes días de vacaciones disponibles.');</script>";
             } else {
                 $requestDate = date('Y-m-d H:i:s');
-                $sql = "INSERT INTO VacationRequests (EmployeeID, StartDate, EndDate, DaysRequested, RequestDate, Reason)  VALUES ('$employeeId', '$startDate', '$endDate', '$daysRequested', '$requestDate','$motivo')";
+                $sql = "INSERT INTO VacationRequests (EmployeeID, StartDate, EndDate, DaysRequested, RequestDate, Reason) VALUES (?, ?, ?, ?, ?, ?)";
 
-                if ($conn->query($sql) === TRUE) {
-                   echo "<script>alert('Solicitud de permiso parcial enviada con éxito.'); window.location.href = 'approve_vacation.php';</script>"; 
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('isssss', $employeeId, $startDate, $endDate, $daysRequested, $requestDate, $motivo);
+
+                if ($stmt->execute()) {
+                    echo "<script>alert('Solicitud de vacaciones enviada con éxito.'); window.location.href = 'approve_vacation.php';</script>";
                 } else {
-                    echo "Error: " . $sql . "<br>" . $conn->error;
+                    echo "Error: " . $stmt->error;
                 }
             }
         }
-    }  elseif ($requestType === 'leave') {
-    // Validar campos de permiso parcial
-    $leaveDate = $_POST['leave_date'];
-    $departureDateTime = $_POST['departure_datetime'];
-    $returnDateTime = $_POST['return_datetime'];
+    } elseif ($requestType === 'leave') {
+        // Validar campos de permiso parcial
+        $leaveDate = $_POST['leave_date'];
+        $departureDateTime = $_POST['departure_datetime'];
+        $returnDateTime = $_POST['return_datetime'];
+        $motivo = $_POST['motivo2'];
 
-    // Convertir fechas a objetos DateTime para facilitar la manipulación
-    $departureDateTimeObj = new DateTime($departureDateTime);
-    $returnDateTimeObj = new DateTime($returnDateTime);
-    $leaveDateObj = new DateTime($leaveDate);
-
-    // Validar que las fechas y horas no sean mayores ni menores que la fecha inicial
-    if ($departureDateTimeObj->format('Y-m-d') !== $leaveDate || $returnDateTimeObj->format('Y-m-d') !== $leaveDate) {
-        echo "<script>alert('La fecha de salida y regreso deben coincidir con la fecha del permiso.');</script>";
-    } else {
-        // Calcular las horas solicitadas incluyendo minutos
-        $interval = $departureDateTimeObj->diff($returnDateTimeObj);
-        $hoursRequested = $interval->h + ($interval->i / 60); // Suma horas y minutos como fracción de hora
-            echo "<script>alert('No tienes días de vacaciones disponibles para solicitar horas.);</script>";
-
-        // Verificar si las horas solicitadas exceden la jornada laboral diaria (10 horas)
-        if ($hoursRequested > 10) {
-            echo "<script>alert('Las horas solicitadas exceden la jornada laboral diaria. Por favor, elige la opción de vacaciones completas.');</script>";
-        } elseif ($hoursRequested <= 1) {
-            // Verificar si el usuario tiene días de vacaciones disponibles
-            echo "<script>alert('Tienes que solicitar un permiso con el tiempo mayor a una hora');</script>";
+        if (empty(trim($motivo))) {
+            echo "<script>alert('El motivo no puede estar vacío.');</script>";
+        } elseif (empty($departureDateTime) || empty($returnDateTime) || empty($leaveDate)) {
+            echo "<script>alert('Por favor, complete todos los campos para la solicitud de permiso parcial.');</script>";
         } else {
-            // Si pasa todas las validaciones, registrar la solicitud en LeaveRequests
-            $requestDate = date('Y-m-d H:i:s');
-            $sql = "INSERT INTO LeaveRequests (EmployeeID, LeaveDate, DepartureDateTime, ReturnDateTime, HoursRequested, RequestDate, Reason) 
-                    VALUES ('$employeeId', '$leaveDate', '$departureDateTime', '$returnDateTime', '$hoursRequested', '$requestDate','$motivo')";
+            // Convertir fechas a objetos DateTime para facilitar la manipulación
+            $departureDateTimeObj = new DateTime($departureDateTime);
+            $returnDateTimeObj = new DateTime($returnDateTime);
+            $leaveDateObj = new DateTime($leaveDate);
 
-            if ($conn->query($sql) === TRUE) {
-
-                   echo "<script>alert('Solicitud de permiso parcial enviada con éxito.'); window.location.href = 'approve_vacation.php';</script>"; 
+            // Validar que las fechas y horas no sean mayores ni menores que la fecha inicial
+            if ($departureDateTimeObj->format('Y-m-d') !== $leaveDate || $returnDateTimeObj->format('Y-m-d') !== $leaveDate) {
+                echo "<script>alert('La fecha de salida y regreso deben coincidir con la fecha del permiso.');</script>";
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                // Calcular las horas solicitadas incluyendo minutos
+                $interval = $departureDateTimeObj->diff($returnDateTimeObj);
+                $hoursRequested = $interval->h + ($interval->i / 60); // Suma horas y minutos como fracción de hora
+
+                if ($hoursRequested > 10) {
+                    echo "<script>alert('Las horas solicitadas exceden la jornada laboral diaria. Por favor, elige la opción de vacaciones completas.');</script>";
+                } elseif ($hoursRequested <= 1) {
+                    echo "<script>alert('Tienes que solicitar un permiso con el tiempo mayor a una hora');</script>";
+                } else {
+                    // Si pasa todas las validaciones, registrar la solicitud en LeaveRequests
+                    $requestDate = date('Y-m-d H:i:s');
+                    $sql = "INSERT INTO LeaveRequests (EmployeeID, LeaveDate, DepartureDateTime, ReturnDateTime, HoursRequested, RequestDate, Reason) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('sssssss', $employeeId, $leaveDate, $departureDateTime, $returnDateTime, $hoursRequested, $requestDate, $motivo);
+
+                    if ($stmt->execute()) {
+                        echo "<script>alert('Solicitud de permiso parcial enviada con éxito.'); window.location.href = 'approve_vacation.php';</script>";
+                    } else {
+                        echo "Error: " . $stmt->error;
+                    }
+                }
             }
         }
     }
-}
 }
 
 $conn->close();

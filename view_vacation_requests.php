@@ -18,7 +18,7 @@ UNION ALL
 
 SELECT 'leave' AS RequestType, lr.LeaveID AS RequestID, lr.DepartureDateTime AS StartDate, lr.ReturnDateTime AS EndDate, 
        lr.HoursRequested AS DaysRequested, lr.RequestDate, NULL AS IsApproved, e.FirstName, e.LastName, a.Username AS ApprovedByName
-FROM LeaveRequests lr
+FROM LeaveRequests lr 
 JOIN Employees e ON lr.EmployeeID = e.EmployeeID
 LEFT JOIN Admins a ON lr.ApprovedBy = a.AdminID
 ";

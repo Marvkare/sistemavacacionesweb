@@ -6,7 +6,50 @@ include 'db.php';
 $employeeId = $_GET['employee_id'];
 
 // Consulta a la vista EmployeeRequests
-$sql = "SELECT * FROM EmployeeRequests WHERE EmployeeID = ?";
+$sql = "
+SELECT 
+    'vacation' AS RequestType, 
+    vr.RequestID AS RequestID, 
+    vr.StartDate AS StartDate, 
+    vr.EndDate AS EndDate, 
+    vr.DaysRequested AS DaysRequested,
+    vr.Reason, 
+    vr.RequestDate AS RequestDate, 
+    vr.IsApproved AS IsApproved, 
+    e.FirstName AS FirstName, 
+    e.LastName AS LastName, 
+    a.Username AS ApprovedByName
+FROM 
+    VacationRequests vr 
+JOIN 
+    Employees e ON vr.EmployeeID = e.EmployeeID
+LEFT JOIN 
+    Admins a ON vr.ApprovedBy = a.AdminID
+
+UNION ALL
+
+SELECT 
+    'leave' AS RequestType, 
+    lr.LeaveID AS RequestID, 
+    lr.DepartureDateTime AS StartDate, 
+    lr.ReturnDateTime AS EndDate, 
+    lr.HoursRequested AS DaysRequested, 
+    lr.Reason,
+    lr.RequestDate AS RequestDate, 
+    lr.IsApproved AS IsApproved, 
+    e.FirstName AS FirstName, 
+    e.LastName AS LastName, 
+    a.Username AS ApprovedByName
+FROM 
+    LeaveRequests lr 
+JOIN 
+    Employees e ON lr.EmployeeID = e.EmployeeID
+LEFT JOIN 
+    Admins a ON lr.ApprovedBy = a.AdminID
+WHERE 
+    e.EmployeeID = ?;
+";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $employeeId);
 $stmt->execute();
@@ -33,16 +76,16 @@ if ($result->num_rows > 0) {
                 <td>" . htmlspecialchars($row["RequestID"]) . "</td>
                 <td>" . htmlspecialchars($row["StartDate"]) . "</td>
                 <td>" . htmlspecialchars($row["EndDate"]) . "</td>
-                <td>" . htmlspecialchars($row["Duration"]) . "</td>
+                <td>" . htmlspecialchars($row["DaysRequested"]) . "</td>
                 <td>" . htmlspecialchars($row["Reason"]) . "</td>
-                <td>" . htmlspecialchars($row["ApprovedBy"]) . "</td>
+                <td>" . htmlspecialchars($row["ApprovedByName"]) . "</td>
                 <td>" . htmlspecialchars($row["RequestDate"]) . "</td>
                 <td>" . ($row["IsApproved"] ? 'Aprobado' : 'No Aprobado') . "</td>
             </tr>";
     }
     echo "</table>";
 } else {
-    echo "<strong>No hay solicitudes para este empleado.<strong>";
+    echo "<strong>No hay solicitudes para este empleado.</strong>";
 }
 
 // Cerrar la conexión

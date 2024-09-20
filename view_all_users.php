@@ -90,7 +90,7 @@ $sql = "SELECT
             HoursRequested, 
             RFC,
             CurrentEntitlement 
-        FROM Employees";
+        FROM Employees WHERE IsActive = 1";
 
 $result = $conn->query($sql);
 
@@ -123,6 +123,8 @@ if ($result->num_rows > 0) {
                 <a href='edit_user.php?employee_id=" . $row["EmployeeID"] . "'>Editar</a> |
                 <a href='view_request_employee.php?employee_id=" . $row["EmployeeID"] . "'>Ver solicitudes</a> |
                 <a href='delete_user.php?employee_id=" . $row["EmployeeID"] . "' onclick='return confirm(\"¿Estás seguro de que quieres eliminar este usuario?\");'>Eliminar</a>
+
+                <a href='updateVacationsUsr.php?employee_id=" . $row["EmployeeID"] . "' onclick='return confirm(\"¿Estás seguro de que quieres eliminar este usuario?\");'>Eliminar</a>
               </td>";
         echo "</tr>";
     }

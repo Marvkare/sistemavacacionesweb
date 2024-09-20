@@ -3,10 +3,12 @@ CREATE TABLE Employees (
     FirstName VARCHAR(50),
     LastName VARCHAR(50),
     HireDate DATE,
+    LastVacationUpdate DATE,
     HoursRequested INT,
     CurrentEntitlement INT,
     DaysTaken INT DEFAULT 0,
     RFC VARCHAR(13) NOT NULL,
+    IsActive TINYINT(1) DEFAULT 1,
     Departament VARCHAR(30) NOT NULL
 );
 
@@ -70,3 +72,33 @@ CREATE TABLE VacationRequests (
     IsApproved BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
 );
+
+
+CREATE VIEW EmployeeRequests AS
+SELECT
+    'Leave' AS RequestType,
+    LeaveID AS RequestID,
+    EmployeeID,
+    LeaveDate AS StartDate,
+    LeaveDate AS EndDate,
+    HoursRequested AS Duration,
+    Reason,
+    ApprovedBy,
+    RequestDate,
+    IsApproved
+FROM
+    LeaveRequests
+UNION ALL
+SELECT
+    'Vacation' AS RequestType,
+    RequestID,
+    EmployeeID,
+    StartDate,
+    EndDate,
+    DaysRequested AS Duration,
+    Reason,
+    ApprovedBy,
+    RequestDate,
+    IsApproved
+FROM
+    VacationRequests;

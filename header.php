@@ -17,8 +17,8 @@
             &#9776;
         </div>
         <ul class="nav-links" id="nav-links">
-            <li><a href="view_all_users.php">Ver Usuarios</a></li>
-            <li><a href="add_user.php">Agregar nuevo usuario</a></li>
+            <li><a href="view_all_users.php">Lista empleados</a></li>
+            <li><a href="add_user.php">Agregar nuevo empleado</a></li>
             <li><a href="view_vacation_requests.php">Peticion de vacaciones</a></li>
             <li><a href="approve_vacation.php">Aprobar vacaciones</a></li>
             <li><a href="logout.php">Cerrar Sesión</a></li>
