@@ -321,6 +321,9 @@ $leaveResult = $conn->query($sqlLeave);
                     <a href="approve_vacation.php?approve=<?= htmlspecialchars($row['RequestID']) ?>&type=vacation" class="approve-button">
                         Aprobar
                     </a>
+                    <a href="reject_vacation.php?approve=<?= htmlspecialchars($row['RequestID']) ?>&type=vacation" class="approve-button">
+    Rechazar
+</a>    
                 </td>
             </tr>
             <?php endwhile; ?>
@@ -348,6 +351,9 @@ $leaveResult = $conn->query($sqlLeave);
                     <a href="approve_vacation.php?approve=<?= htmlspecialchars($row['RequestID']) ?>&type=leave" class="approve-button">
                         Aprobar
                     </a>
+                    <a href="reject_vacation.php?approve=<?= htmlspecialchars($row['RequestID']) ?>&type=vacation" class="approve-button">
+    Rechazar
+</a>
                 </td>
             </tr>
             <?php endwhile; ?>

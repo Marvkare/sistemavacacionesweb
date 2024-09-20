@@ -1,5 +1,5 @@
 <?php
-include 'header.php';
+//include 'header.php';
 include 'db.php';
 session_start();
 if (!isset($_SESSION['admin_id'])) {
@@ -176,7 +176,10 @@ if ($requestId > 0 && ($requestType == 'vacation' || $requestType == 'leave')) {
 <div class="container">
     <div class="header">
     <img src="./img/Logo.png">
-    <h1>TRANSPORTES HIDRO HIDALGENSES, S.A DE C.V</h1>
+    <h1>TRANSPORTES HIDRO HIDALGENSES, 
+    </h1>
+    <h1>S.A DE C.V</h1>
+     
     <h4>SAN MIGUEL VINDHO MUNICIPIO DE TULA DE ALLENDE HGO.</h4>
     <p><strong>RFC: </strong>THH891218DS0</p>
     <div class="header_box1">
@@ -187,6 +190,7 @@ if ($requestId > 0 && ($requestType == 'vacation' || $requestType == 'leave')) {
 
     <p><strong>NO.</strong> <?php echo $requestId; ?></p>
     </div>
+    
     </div><!--Fin del div header -->
         <div class="box1">
         <p><strong>No. Trab:</strong> <?php echo $numTrab; ?></p>

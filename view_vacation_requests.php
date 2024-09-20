@@ -142,7 +142,20 @@ $result = $conn->query($sql);
                     echo "<td>" . ($row['RequestType'] == 'vacation' ? $row['DaysRequested'] . ' días' : $row['DaysRequested'] . ' horas') . "</td>";
                     echo "<td>" . $row['RequestDate'] . "</td>";
                     echo "<td>" . ($row['ApprovedByName'] ? $row['ApprovedByName'] : 'Pendiente') . "</td>";
-                    echo "<td>" . ($row['IsApproved'] !== NULL ? ($row['IsApproved'] ? 'Aprobado' : 'Pendiente') : 'N/A') . "</td>";
+                    
+                    // Modificación para mostrar "Rechazado" si IsApproved es 2
+                    if ($row['IsApproved'] !== NULL) {
+                        if ($row['IsApproved'] == 1) {
+                            echo "<td>Aprobado</td>";
+                        } elseif ($row['IsApproved'] == 2) {
+                            echo "<td>Rechazado</td>";
+                        } else {
+                            echo "<td>Pendiente</td>";
+                        }
+                    } else {
+                        echo "<td>N/A</td>";
+                    }
+
                     echo "<td><a href='view_request.php?RequestID=" . $row['RequestID'] . "&type=" . $row['RequestType'] . "' class='view-button' target='_blank'>Ver Solicitud</a></td>";
                     echo "</tr>";
                 }
@@ -154,4 +167,3 @@ $result = $conn->query($sql);
     </div>
 </body>
 </html>
-
